@@ -29,12 +29,13 @@ namespace NSimulate.Example1
 
         public int BreakdownCount { get; private set; }
 
-        public Machine(Queue<Job> jobQueue,
-                       double reliabilityPercentage,
-                       int repairTimeRequired,
-                       List<Job> unprocessedJobsList,
-                       Random random)
-            : base()
+        public Machine(SimulationContext context,
+            Queue<Job> jobQueue,
+            double reliabilityPercentage,
+            int repairTimeRequired,
+            List<Job> unprocessedJobsList,
+            Random random)
+            : base(context)
         {
             _random = random;
             JobQueue = jobQueue;

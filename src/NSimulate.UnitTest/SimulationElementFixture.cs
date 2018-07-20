@@ -8,19 +8,23 @@ namespace NSimulate.UnitTest
 	[TestFixture()]
 	public class SimulationElementFixture
 	{
-		#region Test Types
+        #region Test Types
 
-		private class TestElement : SimulationElement
-		{
-		}
+        private class TestElement : SimulationElement
+        {
+            public TestElement(SimulationContext context)
+                : base(context)
+            {
+            }
+        }
 
-		#endregion
+        #endregion
 
-		[Test()]
+        [Test()]
 		public void Constructor_SimulationContextExists_ResourceRegistered()
 		{
-			using(var context = new SimulationContext(isDefaultContextForProcess: true)){
-				var element = new TestElement();
+			using(var context = new SimulationContext()){
+				var element = new TestElement(context);
 
 				var registeredElements = context.GetByType<TestElement>();
 				Assert.IsTrue(registeredElements.Contains(element));

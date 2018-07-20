@@ -36,7 +36,7 @@ namespace NSimulate.UnitTest
         [Test()]
         public void CanComplete_ContainedInstructionsCalled_CanCompleteOnlyWhenAllContainedInstructionsCan()
         {
-            using (var context = new SimulationContext(isDefaultContextForProcess: true))
+            using (var context = new SimulationContext())
             {
                 // create a composite instruction with test instructions
                 var testInstructions = new List<TestInstruction>();
@@ -77,7 +77,7 @@ namespace NSimulate.UnitTest
         [Test()]
         public void Complete_ContainedInstructionsCalled_AllContainedInstructionsCompleted()
         {
-            using (var context = new SimulationContext(isDefaultContextForProcess: true))
+            using (var context = new SimulationContext())
             {
                 // create a composite instruction with test instructions
                 var testInstructions = new List<TestInstruction>();

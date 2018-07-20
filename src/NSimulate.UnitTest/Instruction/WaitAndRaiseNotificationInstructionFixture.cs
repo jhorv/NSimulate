@@ -11,10 +11,10 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void CanComplete_BeforeAndAfterEvent_ReturnsTrueOnlyAfterEvent()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess:true)){
+			using (var context = new SimulationContext()){
 
 				var waitInstruction = new WaitNotificationInstruction<object>();
-				var process = new InstructionListTestProcess(new List<InstructionBase>(){ waitInstruction});
+				var process = new InstructionListTestProcess(context, new List<InstructionBase>(){ waitInstruction});
 
 				context.MoveToTimePeriod(0);
 				process.SimulationState.InstructionEnumerator = process.Simulate();
@@ -41,10 +41,10 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void CanComplete_BeforeAndAfterEventWithCondition_ReturnsTrueOnlyAfterEventMatchingCondition()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess:true)){
+			using (var context = new SimulationContext()){
 
 				var waitInstruction = new WaitNotificationInstruction<TestNotification>((e)=>e.Data > 0);
-				var process = new InstructionListTestProcess(new List<InstructionBase>(){ waitInstruction});
+				var process = new InstructionListTestProcess(context, new List<InstructionBase>(){ waitInstruction});
 				context.MoveToTimePeriod(0);
 				process.SimulationState.InstructionEnumerator = process.Simulate();
 				process.SimulationState.InstructionEnumerator.MoveNext();

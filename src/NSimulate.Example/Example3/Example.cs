@@ -9,18 +9,18 @@ namespace NSimulate.Example3
 	{
 		public static void Run(){
 			// Make a simulation context
-			using (var context = new SimulationContext(isDefaultContextForProcess: true))
+			using (var context = new SimulationContext())
 			{
 				var products = CreateProducts();
 
-				var inventory = CreateWarehouseInventory(products);
+				var inventory = CreateWarehouseInventory(context, products);
 				context.Register<WarehouseInventory>(inventory);
 
 				var orders = GenerateOrders(500, products);
-    			var deliveryPeople = CreateDeliveryPeople(3, orders);
+    			var deliveryPeople = CreateDeliveryPeople(context, 3, orders);
 
 				// instantate a new simulator
-				var simulator = new Simulator();
+				var simulator = new Simulator(context);
 
 				// run the simulation
 				simulator.Simulate();
@@ -39,18 +39,18 @@ namespace NSimulate.Example3
 			};
 		}
 
-		private static IEnumerable<DeliveryPerson> CreateDeliveryPeople(int numberOfDeliveryPeople, OrderQueue queue) {
+		private static IEnumerable<DeliveryPerson> CreateDeliveryPeople(SimulationContext context, int numberOfDeliveryPeople, OrderQueue queue) {
 			var deliveryPeople =  new List<DeliveryPerson>();
 
 			for(int i = 0; i < numberOfDeliveryPeople; i++){
-				deliveryPeople.Add(new DeliveryPerson(queue));
+				deliveryPeople.Add(new DeliveryPerson(context, queue));
 			}
 
 			return deliveryPeople;
 		}
 
-		private static WarehouseInventory CreateWarehouseInventory(IEnumerable<Product> products) {
-			var inventory = new WarehouseInventory();
+		private static WarehouseInventory CreateWarehouseInventory(SimulationContext context, IEnumerable<Product> products) {
+			var inventory = new WarehouseInventory(context);
 
 			// start with an inventory of twice the reorder level of each product
 			foreach(var product in products){

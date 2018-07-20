@@ -41,7 +41,7 @@ namespace NSimulate.Instruction
         {
             base.Complete(context);
 
-            var process = new ActivityHostProcess(Activity, WaitTime);
+            var process = new ActivityHostProcess(context, Activity, WaitTime);
             context.Register(process);
 
             if (context.ActiveProcesses != null)

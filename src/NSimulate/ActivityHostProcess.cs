@@ -5,7 +5,8 @@ namespace NSimulate
 {
     public class ActivityHostProcess : Process
     {
-        public ActivityHostProcess(Activity activity, long waitTime)
+        public ActivityHostProcess(SimulationContext context, Activity activity, long waitTime)
+            : base(context)
         {
             WaitTime = waitTime;
             Activity = activity;

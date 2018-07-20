@@ -11,7 +11,7 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Complete_ContextPassed_ContextFlaggedForSimulationTerminate()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess:true)){
+			using (var context = new SimulationContext()){
 
 				Assert.IsFalse(context.IsSimulationTerminating);
 				var instruction = new TerminateSimulationInstruction();

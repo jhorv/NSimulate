@@ -4,8 +4,8 @@ namespace NSimulate.UnitTest
 {
 	public class TestResource : Resource
 	{
-		public TestResource (int capacity)
-			: base(capacity)
+		public TestResource (SimulationContext context, int capacity)
+			: base(context, capacity)
 		{
 		}
 

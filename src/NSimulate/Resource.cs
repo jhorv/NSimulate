@@ -7,25 +7,35 @@ namespace NSimulate
     /// </summary>
     public class Resource : SimulationElement
     {
-        public Resource()
-        {
-        }
+        //public Resource()
+        //{
+        //}
 
-        public Resource(int capacity)
-        {
-            Capacity = capacity;
-        }
+        //public Resource(int capacity)
+        //{
+        //    Capacity = capacity;
+        //}
 
-        public Resource(object key, int capacity)
-            : base(key)
+        //public Resource(object key, int capacity)
+        //    : base(key)
+        //{
+        //    Capacity = capacity;
+        //}
+
+        public Resource(SimulationContext context)
+            : base(context)
         {
-            Capacity = capacity;
         }
 
         public Resource(SimulationContext context, int capacity)
             : base(context)
         {
             Capacity = capacity;
+        }
+
+        public Resource(SimulationContext context, object key)
+            : base(context, key)
+        {
         }
 
         public Resource(SimulationContext context, object key, int capacity)

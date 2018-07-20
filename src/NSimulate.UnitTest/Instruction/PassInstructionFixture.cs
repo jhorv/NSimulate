@@ -11,7 +11,7 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void CanComplete_ContextPassed_ReturnsFalseUntilTimePeriodChanged()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess:true)){
+			using (var context = new SimulationContext()){
 
 				context.MoveToTimePeriod(0);
 				var instruction = new PassInstruction();

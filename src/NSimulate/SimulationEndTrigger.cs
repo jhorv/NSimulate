@@ -10,7 +10,8 @@ namespace NSimulate
     /// </summary>
     public class SimulationEndTrigger : Process
     {
-        public SimulationEndTrigger(Func<bool> condition)
+        public SimulationEndTrigger(SimulationContext context, Func<bool> condition)
+            : base(context)
         {
             Condition = condition;
         }

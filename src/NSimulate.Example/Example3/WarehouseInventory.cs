@@ -12,7 +12,8 @@ namespace NSimulate.Example3
 		/// <summary>
 		/// Initializes a new instance of the <see cref="NSimulate.Example3.WarehouseInventory"/> class.
 		/// </summary>
-		public WarehouseInventory ()
+		public WarehouseInventory (SimulationContext context)
+            : base(context)
 		{
 			QuantityByProduct = new Dictionary<Product, int>();
 		}

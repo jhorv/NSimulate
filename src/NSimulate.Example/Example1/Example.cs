@@ -17,7 +17,7 @@ namespace NSimulate.Example1
 		public static void Run()
         {
 			// Make a simulation context
-			using (var context = new SimulationContext(isDefaultContextForProcess: true))
+			using (var context = new SimulationContext())
 			{
 				// initialise the model
 				var machines = CreateModel(context, numberOfJobs: 500);
@@ -59,11 +59,11 @@ namespace NSimulate.Example1
 
 			var random = new Random();
 			// create machines
-			var machine1 = new Machine(jobQueue: workTypeAJobQueue, reliabilityPercentage: 95.0, repairTimeRequired: 15, unprocessedJobsList: unprocessedJobsList, random: random);
-			var machine2 = new Machine(jobQueue: workTypeAJobQueue, reliabilityPercentage: 85.0, repairTimeRequired: 22, unprocessedJobsList: unprocessedJobsList, random: random);
-			var machine3 = new Machine(jobQueue: workTypeBJobQueue, reliabilityPercentage: 99.0, repairTimeRequired: 15, unprocessedJobsList: unprocessedJobsList, random: random);
-			var machine4 = new Machine(jobQueue: workTypeBJobQueue, reliabilityPercentage: 96.0, repairTimeRequired: 17, unprocessedJobsList: unprocessedJobsList, random: random);
-			var machine5 = new Machine(jobQueue: workTypeCJobQueue, reliabilityPercentage: 98.0, repairTimeRequired: 20, unprocessedJobsList: unprocessedJobsList, random: random);
+			var machine1 = new Machine(context, jobQueue: workTypeAJobQueue, reliabilityPercentage: 95.0, repairTimeRequired: 15, unprocessedJobsList: unprocessedJobsList, random: random);
+			var machine2 = new Machine(context, jobQueue: workTypeAJobQueue, reliabilityPercentage: 85.0, repairTimeRequired: 22, unprocessedJobsList: unprocessedJobsList, random: random);
+			var machine3 = new Machine(context, jobQueue: workTypeBJobQueue, reliabilityPercentage: 99.0, repairTimeRequired: 15, unprocessedJobsList: unprocessedJobsList, random: random);
+			var machine4 = new Machine(context, jobQueue: workTypeBJobQueue, reliabilityPercentage: 96.0, repairTimeRequired: 17, unprocessedJobsList: unprocessedJobsList, random: random);
+			var machine5 = new Machine(context, jobQueue: workTypeCJobQueue, reliabilityPercentage: 98.0, repairTimeRequired: 20, unprocessedJobsList: unprocessedJobsList, random: random);
 
 			var machines = new List<Machine>()
 			{
@@ -91,10 +91,10 @@ namespace NSimulate.Example1
 			}
 
 			// add a repair person
-			new RepairPerson() { Capacity = 1};
+			new RepairPerson(context) { Capacity = 1};
 
 			// add the end condition
-			new SimulationEndTrigger(()=>unprocessedJobsList.Count == 0);
+			new SimulationEndTrigger(context, ()=>unprocessedJobsList.Count == 0);
 
 			return machines;
 		}

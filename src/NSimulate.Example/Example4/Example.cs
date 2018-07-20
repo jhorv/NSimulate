@@ -12,7 +12,7 @@ namespace NSimulate.Example4
         public static void Run()
         {
             // Make a simulation context
-            using (var context = new SimulationContext(isDefaultContextForProcess: true))
+            using (var context = new SimulationContext())
             {
                 // instantiate the process responsible for setting alarms
                 new AlarmSettingProcess(context);

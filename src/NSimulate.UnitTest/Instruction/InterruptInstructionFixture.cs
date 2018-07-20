@@ -11,8 +11,8 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Complete_ContextPassed_ProcessActivated()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess:true)){
-				var testProcess = new InstructionListTestProcess(new WaitInstruction(10));
+			using (var context = new SimulationContext()){
+				var testProcess = new InstructionListTestProcess(context, new WaitInstruction(10));
 				var enumerator = testProcess.Simulate();
 				testProcess.SimulationState.InstructionEnumerator = enumerator;
 

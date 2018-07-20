@@ -20,7 +20,7 @@
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <Externalconsole>true</Externalconsole>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -30,7 +30,7 @@
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <Externalconsole>true</Externalconsole>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>

@@ -10,7 +10,7 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void CanComplete_ConditionNotMet_ReturnsFalse()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess: true)){
+			using (var context = new SimulationContext()){
 				var instruction = new WaitConditionInstruction(()=>1==2);
 
 				long? nextTimePeriodCheck;
@@ -24,7 +24,7 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void CanComplete_ConditionMet_ReturnsTrue()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess: true)){
+			using (var context = new SimulationContext()){
 				var instruction = new WaitConditionInstruction(()=>1==1);
 
 				long? nextTimePeriodCheck;

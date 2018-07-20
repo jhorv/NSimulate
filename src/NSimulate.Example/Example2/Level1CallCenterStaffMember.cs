@@ -11,7 +11,8 @@ namespace NSimulate.Example2
 		/// <summary>
 		/// Initializes a new instance of the <see cref="NSimulate.Example2.Level1CallCenterStaffMember"/> class.
 		/// </summary>
-		public Level1CallCenterStaffMember ()
+		public Level1CallCenterStaffMember (SimulationContext context)
+            : base(context)
 		{
 		}
 	}

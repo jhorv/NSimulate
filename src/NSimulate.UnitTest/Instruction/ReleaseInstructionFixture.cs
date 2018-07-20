@@ -13,10 +13,10 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Complete_ResourcesAllocated_ResourcesDeallocated()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess:true)){
+			using (var context = new SimulationContext()){
 
 				int resouceCapacity = 5;
-				var testResourceSet1 = new TestResource(resouceCapacity) { Code = "First", Priority = 10 };
+				var testResourceSet1 = new TestResource(context, resouceCapacity) { Code = "First", Priority = 10 };
 				context.Register<TestResource>(testResourceSet1);
 
 				var allocateInstruction = new AllocateInstruction<TestResource>(resouceCapacity);

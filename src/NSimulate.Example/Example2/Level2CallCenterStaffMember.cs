@@ -8,10 +8,8 @@ namespace NSimulate.Example2
 	/// </summary>
 	public class Level2CallCenterStaffMember : Resource
 	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="NSimulate.Example2.Level2CallCenterStaffMember"/> class.
-		/// </summary>
-		public Level2CallCenterStaffMember ()
+		public Level2CallCenterStaffMember(SimulationContext context)
+            : base(context)
 		{
 		}
 	}

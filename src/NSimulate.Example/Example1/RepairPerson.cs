@@ -8,10 +8,8 @@ namespace NSimulate.Example1
 	/// </summary>
 	public class RepairPerson : Resource
 	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="NSimulate.Example1.RepairPerson"/> class.
-		/// </summary>
-		public RepairPerson ()
+		public RepairPerson(SimulationContext context)
+            : base(context)
 		{
 		}
 	}

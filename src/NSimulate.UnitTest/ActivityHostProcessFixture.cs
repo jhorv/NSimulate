@@ -13,13 +13,13 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Simulate_ActivitySpecified_ActivityFiredAtTheAppropriateTime()
 		{
-			using(var context = new SimulationContext(isDefaultContextForProcess: true)){
+			using(var context = new SimulationContext()){
 
 				var notification = new TestNotification();
 				var activity = new TestActivity(new List<InstructionBase>() { new RaiseNotificationInstruction<TestNotification>(notification) });
 				long waitTime = 10;
 
-				var process = new ActivityHostProcess(activity, waitTime);
+				var process = new ActivityHostProcess(context, activity, waitTime);
 
 				Assert.IsNotNull(process.SimulationState);
 				Assert.IsTrue(process.SimulationState.IsActive);

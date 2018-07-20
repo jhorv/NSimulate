@@ -14,11 +14,11 @@ namespace NSimulate.Example2
 		/// </summary>
 		public static void Run(){
 			// Make a simulation context
-			using (var context = new SimulationContext(isDefaultContextForProcess: true))
+			using (var context = new SimulationContext())
 			{
 				// Add the resources that represent the staff of the call center
-				context.Register<Level1CallCenterStaffMember>(new Level1CallCenterStaffMember(){ Capacity = 10 });
-				context.Register<Level2CallCenterStaffMember>(new Level2CallCenterStaffMember(){ Capacity = 5 });
+				context.Register<Level1CallCenterStaffMember>(new Level1CallCenterStaffMember(context){ Capacity = 10 });
+				context.Register<Level2CallCenterStaffMember>(new Level2CallCenterStaffMember(context){ Capacity = 5 });
 
 				// Add the processes that represent the phone calls to the call center
 				IEnumerable<Call> calls = GeneratePhoneCalls(context,
@@ -29,7 +29,7 @@ namespace NSimulate.Example2
 				    callStartTimeRange: 14400);
                 
 				// instantate a new simulator
-				var simulator = new Simulator();
+				var simulator = new Simulator(context);
 
 				// run the simulation
 				simulator.Simulate();
@@ -96,7 +96,7 @@ namespace NSimulate.Example2
 
 				}
 
-				var newCall = new Call(characteristics);
+				var newCall = new Call(context, characteristics);
 				calls.Add(newCall);
 			}
 

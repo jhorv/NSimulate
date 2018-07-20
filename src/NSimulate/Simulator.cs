@@ -10,10 +10,10 @@ namespace NSimulate
     /// </summary>
     public class Simulator
     {
-        public Simulator()
-            : this(SimulationContext.Current)
-        {
-        }
+        //public Simulator()
+        //    : this(SimulationContext.Current)
+        //{
+        //}
 
         public Simulator(SimulationContext context)
         {

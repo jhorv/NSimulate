@@ -12,8 +12,8 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Constructor_SimulationContextExists_ProcessRegistered()
 		{
-			using(var context = new SimulationContext(isDefaultContextForProcess: true)){
-				var process = new Process();
+			using(var context = new SimulationContext()){
+				var process = new Process(context);
 
 				Assert.IsNotNull(process.SimulationState);
 				Assert.IsTrue(process.SimulationState.IsActive);
@@ -26,12 +26,15 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Simulate_EnumerableReturned()
 		{
-			var process = new Process();
+            using (var context = new SimulationContext())
+            {
+                var process = new Process(context);
 
-			var enumerator = process.Simulate();
+                var enumerator = process.Simulate();
 
-			Assert.IsNotNull(enumerator);
-			Assert.IsFalse(enumerator.MoveNext());
+                Assert.IsNotNull(enumerator);
+                Assert.IsFalse(enumerator.MoveNext());
+            }
 		}
 	}
 }

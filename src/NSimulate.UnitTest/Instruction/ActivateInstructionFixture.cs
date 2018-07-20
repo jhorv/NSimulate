@@ -16,9 +16,9 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Complete_ContextPassed_ProcessActivated()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess:true)){
+			using (var context = new SimulationContext()){
 
-				Process testProcess = new Process();
+				Process testProcess = new Process(context);
 				testProcess.SimulationState.IsActive = false;
 
 				context.MoveToTimePeriod(0);

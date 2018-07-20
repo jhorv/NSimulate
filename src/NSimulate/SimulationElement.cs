@@ -7,15 +7,15 @@ namespace NSimulate
     /// </summary>
     public abstract class SimulationElement
     {
-        protected SimulationElement()
-            : this(SimulationContext.Current, Guid.NewGuid())
-        {
-        }
+        //protected SimulationElement()
+        //    : this(SimulationContext.Current, Guid.NewGuid())
+        //{
+        //}
 
-        protected SimulationElement(object key)
-            : this(SimulationContext.Current, key)
-        {
-        }
+        //protected SimulationElement(object key)
+        //    : this(SimulationContext.Current, key)
+        //{
+        //}
 
         protected SimulationElement(SimulationContext context)
             : this(context, Guid.NewGuid())

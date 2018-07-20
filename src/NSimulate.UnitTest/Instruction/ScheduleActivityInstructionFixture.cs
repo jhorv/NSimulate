@@ -12,7 +12,7 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Complete_ActivitySpecified_ActivityScheduled()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess:true)){
+			using (var context = new SimulationContext()){
 			
 				long waitTime = 10;
 				var activity = new Activity();

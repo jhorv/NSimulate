@@ -16,16 +16,16 @@ namespace NSimulate
 
 		int _instanceIndex = nextInstanceIndex++;
 
-		public Process ()
-		{
-			SimulationState = new ProcessSimulationState();
-		}
+		//public Process ()
+		//{
+		//	SimulationState = new ProcessSimulationState();
+		//}
 
-		public Process (object key)
-			: base(key)
-		{
-			SimulationState = new ProcessSimulationState();
-		}
+		//public Process (object key)
+		//	: base(key)
+		//{
+		//	SimulationState = new ProcessSimulationState();
+		//}
 
 		public Process (SimulationContext context)
 			: base(context)

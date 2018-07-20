@@ -16,7 +16,8 @@ namespace NSimulate.Example2
 		/// <param name='characteristics'>
 		/// Characteristics that drive behaviour for the call
 		/// </param>
-		public Call (CallCharacteristics characteristics)
+		public Call (SimulationContext context, CallCharacteristics characteristics)
+            : base(context)
 		{
 			Characteristics = characteristics;
 			Statistics = new CallStatistics();
@@ -25,24 +26,12 @@ namespace NSimulate.Example2
 		/// <summary>
 		/// Gets or sets the characteristics that drive behaviour for this call.
 		/// </summary>
-		/// <value>
-		/// The characteristics.
-		/// </value>
-		public CallCharacteristics Characteristics {
-			get;
-			set;
-		}
+		public CallCharacteristics Characteristics { get; set; }
 
 		/// <summary>
 		/// Gets or sets the statistics instance for this call
 		/// </summary>
-		/// <value>
-		/// The statistics recorded for this call.
-		/// </value>
-		public CallStatistics Statistics {
-			get;
-			set;
-		}
+		public CallStatistics Statistics { get; set; }
 
 		/// <summary>
 		///  Simulate this phone call 

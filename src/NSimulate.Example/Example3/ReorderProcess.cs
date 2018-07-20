@@ -19,7 +19,8 @@ namespace NSimulate.Example3
 		/// <param name='product'>
 		/// Product to be reordered
 		/// </param>
-		public ReorderProcess (Product product)
+		public ReorderProcess (SimulationContext context, Product product)
+            : base(context)
 		{
 			_product = product;
 		}

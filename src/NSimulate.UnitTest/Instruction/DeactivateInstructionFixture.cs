@@ -10,9 +10,9 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Complete_ContextPassed_ProcessDeActivated()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess:true)){
+			using (var context = new SimulationContext()){
 
-				Process testProcess = new Process();
+				Process testProcess = new Process(context);
 				context.MoveToTimePeriod(0);
 
 				Assert.IsTrue(context.ActiveProcesses.Contains(testProcess));

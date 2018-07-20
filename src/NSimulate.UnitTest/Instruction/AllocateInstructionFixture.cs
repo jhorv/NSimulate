@@ -13,10 +13,10 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Complete_Multiple_ReturnsTrueOnlyWhenEnoughResources()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess:true)){
+			using (var context = new SimulationContext()){
 
 				int resouceCapacity = 5;
-				var testResourceSet1 = new TestResource(resouceCapacity) { Code = "First", Priority = 10 };
+				var testResourceSet1 = new TestResource(context, resouceCapacity) { Code = "First", Priority = 10 };
 				context.Register<TestResource>(testResourceSet1);
 
 				// try to allocate one more than the total resources
@@ -50,12 +50,12 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Complete_WithPriority_ResourcesAllocatedInPriorityOrder()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess:true)){
+			using (var context = new SimulationContext()){
 
 				int resouceCapacity = 10;
-				var testResourceSet1 = new TestResource(resouceCapacity) { Code = "First", Priority = 10 };
-				var testResourceSet2 = new TestResource(resouceCapacity) { Code = "Second", Priority = 20 };
-				var testResourceSet3 = new TestResource(resouceCapacity) { Code = "Third", Priority = 5 };
+				var testResourceSet1 = new TestResource(context, resouceCapacity) { Code = "First", Priority = 10 };
+				var testResourceSet2 = new TestResource(context, resouceCapacity) { Code = "Second", Priority = 20 };
+				var testResourceSet3 = new TestResource(context, resouceCapacity) { Code = "Third", Priority = 5 };
 
 				context.Register<TestResource>(testResourceSet1);
 				context.Register<TestResource>(testResourceSet2);
@@ -90,12 +90,12 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Complete_WithFilter_ResourcesAllocatedInPriorityOrder()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess:true)){
+			using (var context = new SimulationContext()){
 
 				int resouceCapacity = 10;
-				var testResourceSet1 = new TestResource(resouceCapacity) { Code = "First", Priority = 10 };
-				var testResourceSet2 = new TestResource(resouceCapacity) { Code = "Second", Priority = 20 };
-				var testResourceSet3 = new TestResource(resouceCapacity) { Code = "Third", Priority = 5 };
+				var testResourceSet1 = new TestResource(context, resouceCapacity) { Code = "First", Priority = 10 };
+				var testResourceSet2 = new TestResource(context, resouceCapacity) { Code = "Second", Priority = 20 };
+				var testResourceSet3 = new TestResource(context, resouceCapacity) { Code = "Third", Priority = 5 };
 
 				context.Register<TestResource>(testResourceSet1);
 				context.Register<TestResource>(testResourceSet2);

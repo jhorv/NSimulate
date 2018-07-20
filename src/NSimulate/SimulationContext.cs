@@ -10,20 +10,20 @@ namespace NSimulate
     /// </summary>
     public class SimulationContext : IDisposable
     {
-        static SimulationContext _current;
+        //static SimulationContext _current;
 
-        [ThreadStatic]
-        static SimulationContext _currentForThread;
+        //[ThreadStatic]
+        //static SimulationContext _currentForThread;
 
         Dictionary<Type, Dictionary<object, SimulationElement>> _registeredElements = new Dictionary<Type, Dictionary<object, SimulationElement>>();
 
-        /// <summary>
-        /// Gets the current SimulationContext.  A new SimulationContext is created if one does not already exist.
-        /// </summary>
-        public static SimulationContext Current => _currentForThread ?? _current;
+        ///// <summary>
+        ///// Gets the current SimulationContext.  A new SimulationContext is created if one does not already exist.
+        ///// </summary>
+        //public static SimulationContext Current => _currentForThread ?? _current;
 
         public SimulationContext()
-            : this(false)
+            //: this(false)
         {
         }
 
@@ -104,23 +104,23 @@ namespace NSimulate
             ProcessedProcesses = new HashSet<Process>();
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NSimulate.SimulationContext"/> class.
-        /// </summary>
-        /// <param name="isDefaultContextForProcess">if true, this context will become the default for the process</param>
-        /// <param name="isDefaultContextForThread">if true, this context will become the default for the current thread</param>
-        public SimulationContext(bool isDefaultContextForProcess, bool isDefaultContextForThread = false)
-        {
-            if (isDefaultContextForProcess)
-            {
-                _current = this;
-            }
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="NSimulate.SimulationContext"/> class.
+        ///// </summary>
+        ///// <param name="isDefaultContextForProcess">if true, this context will become the default for the process</param>
+        ///// <param name="isDefaultContextForThread">if true, this context will become the default for the current thread</param>
+        //public SimulationContext(bool isDefaultContextForProcess, bool isDefaultContextForThread = false)
+        //{
+        //    if (isDefaultContextForProcess)
+        //    {
+        //        _current = this;
+        //    }
 
-            if (isDefaultContextForThread)
-            {
-                _currentForThread = this;
-            }
-        }
+        //    if (isDefaultContextForThread)
+        //    {
+        //        _currentForThread = this;
+        //    }
+        //}
 
         /// <summary>
         /// Register an object with this context
@@ -219,15 +219,15 @@ namespace NSimulate
         /// </remarks>
         public void Dispose()
         {
-            if (_current == this)
-            {
-                _current = null;
-            }
+            //if (_current == this)
+            //{
+            //    _current = null;
+            //}
 
-            if (_currentForThread == this)
-            {
-                _currentForThread = null;
-            }
+            //if (_currentForThread == this)
+            //{
+            //    _currentForThread = null;
+            //}
         }
 
         /// <summary>

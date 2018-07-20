@@ -12,9 +12,9 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Constructor_SimulationContextExists_ResourceRegistered()
 		{
-			using(var context = new SimulationContext(isDefaultContextForProcess: true)){
+			using(var context = new SimulationContext()){
 				int capacity = 10;
-				var resource = new Resource(capacity);
+				var resource = new Resource(context, capacity);
 
 				Assert.AreEqual(0, resource.Allocated);
 				Assert.AreEqual(capacity, resource.Capacity);

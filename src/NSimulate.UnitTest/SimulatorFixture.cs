@@ -12,7 +12,7 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Simulate_VariousProcesses_SimulateAsExpected ()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess: true)){
+			using (var context = new SimulationContext()){
 				var processor1Instructions = new List<InstructionBase>(){
 					new WaitInstruction(5),
 					new WaitInstruction(10)
@@ -27,14 +27,14 @@ namespace NSimulate.UnitTest
 					new WaitInstruction(9),
 				};
 
-				var processor1 = new InstructionListTestProcess(processor1Instructions);
-				var processor2 = new InstructionListTestProcess(processor2Instructions);
-				var processor3 = new InstructionListTestProcess(processor3Instructions);
+				var processor1 = new InstructionListTestProcess(context, processor1Instructions);
+				var processor2 = new InstructionListTestProcess(context, processor2Instructions);
+				var processor3 = new InstructionListTestProcess(context, processor3Instructions);
 
 				processor3.SimulationState.IsActive = false;
 				processor2Instructions.Add(new ActivateInstruction(processor3));
 
-				var simulator = new Simulator();
+				var simulator = new Simulator(context);
 
 				simulator.Simulate();
 
@@ -53,7 +53,7 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Simulate_Terminated_SimulationEndsAtTerminatedPeriod ()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess: true)){
+			using (var context = new SimulationContext()){
 				var processor1Instructions = new List<InstructionBase>(){
 					new WaitInstruction(5),
 					new WaitInstruction(10)
@@ -65,10 +65,10 @@ namespace NSimulate.UnitTest
 					new WaitInstruction(9),
 				};
 
-				var processor1 = new InstructionListTestProcess(processor1Instructions);
-				var processor2 = new InstructionListTestProcess(processor2Instructions);
+				var processor1 = new InstructionListTestProcess(context, processor1Instructions);
+				var processor2 = new InstructionListTestProcess(context, processor2Instructions);
 
-				var simulator = new Simulator();
+				var simulator = new Simulator(context);
 
 				simulator.Simulate();
 
@@ -85,9 +85,9 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void Simulate_ResourceContention_SimulationEndsAtExpectedPeriod ()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess: true)){
+			using (var context = new SimulationContext()){
 
-				new TestResource(1);
+				new TestResource(context, 1);
 
 				var firstAllocation = new AllocateInstruction<TestResource>(1);
 				var secondAllocation = new AllocateInstruction<TestResource>(1);
@@ -108,10 +108,10 @@ namespace NSimulate.UnitTest
 					new WaitInstruction(9),
 				};
 
-				var processor1 = new InstructionListTestProcess(processor1Instructions);
-				var processor2 = new InstructionListTestProcess(processor2Instructions);
+				var processor1 = new InstructionListTestProcess(context, processor1Instructions);
+				var processor2 = new InstructionListTestProcess(context, processor2Instructions);
 
-				var simulator = new Simulator();
+				var simulator = new Simulator(context);
 
 				simulator.Simulate();
 

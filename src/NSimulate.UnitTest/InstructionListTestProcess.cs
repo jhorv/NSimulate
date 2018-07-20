@@ -11,12 +11,16 @@ namespace NSimulate.UnitTest
 	{
 		private IEnumerable<InstructionBase> _instructions;
 
-		public InstructionListTestProcess(IEnumerable<InstructionBase> instructions){
+		public InstructionListTestProcess(SimulationContext context, IEnumerable<InstructionBase> instructions)
+            : base(context)
+        {
 
 			_instructions = instructions;
 		}
 
-		public InstructionListTestProcess(params InstructionBase[] instructions){
+		public InstructionListTestProcess(SimulationContext context, params InstructionBase[] instructions)
+            : base(context)
+        {
 			_instructions = instructions.ToList();
 		}
 

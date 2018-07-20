@@ -13,7 +13,7 @@ namespace NSimulate.UnitTest
 		[Test()]
 		public void CanComplete_Various_ReturnsFalseUntilWaitTimeElapsed()
 		{
-			using (var context = new SimulationContext(isDefaultContextForProcess:true)){
+			using (var context = new SimulationContext()){
 
 				long waitPeriods = 10;
 				var instruction = new WaitInstruction(waitPeriods);
