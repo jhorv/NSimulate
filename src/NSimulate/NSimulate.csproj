@@ -36,6 +36,7 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
+    <Compile Include="Instruction\RaiseNotificationInstruction.cs" />
     <Compile Include="Process.cs" />
     <Compile Include="Resource.cs" />
     <Compile Include="SimulationContext.cs" />
@@ -58,7 +59,7 @@
     <Compile Include="Instruction\WaitConditionInstruction.cs" />
     <Compile Include="SimulationEndTrigger.cs" />
     <Compile Include="Instruction\WaitNotificationInstruction.cs" />
-    <Compile Include="Instruction\RaiseNotificationInstruction.cs" />
+    <Compile Include="Instruction\RaiseNotificationInstructionOfT.cs" />
     <Compile Include="ActivityHostProcess.cs" />
     <Compile Include="Activity.cs" />
     <Compile Include="Instruction\ScheduleActivityInstruction.cs" />

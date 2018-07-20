@@ -20,7 +20,7 @@ namespace NSimulate.Example
 			bool skipLastCharacterExit = false;
 
 			while(!exitOnNextLoop){
-				exitOnNextLoop = true;
+				//exitOnNextLoop = true;
 				Console.WriteLine("Choose an example:");
 				Console.WriteLine("      1:  Workshop with unreliable machines");
 				Console.WriteLine("      2:  Call center");
@@ -46,7 +46,8 @@ namespace NSimulate.Example
 						break;
 					case "Q":
 					    skipLastCharacterExit = true;
-						break;
+                        exitOnNextLoop = true;
+                        break;
 					default:
 						exitOnNextLoop = false;
 						break;

@@ -10,13 +10,13 @@ namespace NSimulate
 		{
 		}
 
-		/// <summary>
-		/// Simulate the activity.
-		/// </summary>
-		public virtual IEnumerator<InstructionBase> Simulate()
-		{
-			return new List<InstructionBase>().GetEnumerator();
-		}
-	}
+        /// <summary>
+        /// Simulate the activity.
+        /// </summary>
+        public virtual IEnumerator<InstructionBase> Simulate()
+        {
+            yield break;
+        }
+    }
 }
 

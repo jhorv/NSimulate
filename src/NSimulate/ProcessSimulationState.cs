@@ -10,73 +10,35 @@ namespace NSimulate
 	/// </summary>
 	public class ProcessSimulationState
 	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="NSimulate.ProcessSimulationState"/> class.
-		/// </summary>
-		public ProcessSimulationState ()
+		public ProcessSimulationState()
 		{
 			IsActive = true;
 		}
 
 		/// <summary>
-		/// Gets or sets the last instruction issued by the process
+		/// The last instruction issued by the process
 		/// </summary>
-		/// <value>
-		/// The last instruction.
-		/// </value>
-		public InstructionBase LastInstruction
-		{
-			get;
-			set;
-		}
+		public InstructionBase LastInstruction { get; set; }
+
+        /// <summary>
+        /// Indicates whether the process is active.
+        /// </summary>
+        public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Indicates whether the process has been interrupted
+        /// </summary>
+        public bool IsInterrupted { get; set; }
 
 		/// <summary>
-		/// Gets or sets a value indicating whether the process is active.
+		/// Indicates whether the process has been completed.
 		/// </summary>
-		/// <value>
-		/// <c>true</c> if the process is active; otherwise, <c>false</c>.
-		/// </value>
-		public bool IsActive
-		{
-			get;
-			set;
-		}
+		public bool IsComplete { get; set; }
 
 		/// <summary>
-		/// Gets or sets a value indicating whether the process has been interrupted
+		/// The enumerator used to iterate through instructions issued by this process.
 		/// </summary>
-		/// <value>
-		/// <c>true</c> if this instance has been interrupted; otherwise, <c>false</c>.
-		/// </value>
-		public bool IsInterrupted
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// Gets or sets a value indicating whether the process has been completed.
-		/// </summary>
-		/// <value>
-		/// <c>true</c> if the process has completed; otherwise, <c>false</c>.
-		/// </value>
-		public bool IsComplete
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// Gets or sets the enumerator used to iterate through instructions issued by this process.
-		/// </summary>
-		/// <value>
-		/// The instruction enumerator.
-		/// </value>
-		public IEnumerator<InstructionBase> InstructionEnumerator
-		{
-			get;
-			set;
-		}
+		public IEnumerator<InstructionBase> InstructionEnumerator { get; set; }
 	}
 }
 

@@ -17,12 +17,13 @@ namespace NSimulate.UnitTest
 			private set;
 		}
 
-		public override System.Collections.Generic.IEnumerator<InstructionBase> Simulate ()
-		{
-			foreach(var instruction in Instructions){
-				yield return instruction;
-			}
-		}
-	}
+        public override IEnumerator<InstructionBase> Simulate()
+        {
+            foreach (var instruction in Instructions)
+            {
+                yield return instruction;
+            }
+        }
+    }
 }
 

@@ -12,45 +12,27 @@ namespace NSimulate
 	{
 		public static int nextInstanceIndex = 1;
 
-		/// <summary>
-		/// Backing field for the Priority property
-		/// </summary>
-		private Priority priority = Priority.Medium;
+		Priority _priority = Priority.Medium;
 
-		/// <summary>
-		/// Backing field for the instance index property
-		/// </summary>
-		private int instanceIndex = nextInstanceIndex++;
+		int _instanceIndex = nextInstanceIndex++;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="NSimulate.Process"/> class.
-		/// </summary>
 		public Process ()
 		{
 			SimulationState = new ProcessSimulationState();
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="NSimulate.Process"/> class.
-		/// </summary>
 		public Process (object key)
 			: base(key)
 		{
 			SimulationState = new ProcessSimulationState();
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="NSimulate.Process"/> class.
-		/// </summary>
 		public Process (SimulationContext context)
 			: base(context)
 		{
 			SimulationState = new ProcessSimulationState();
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="NSimulate.Process"/> class.
-		/// </summary>
 		public Process (SimulationContext context, object key)
 			: base(context, key)
 		{
@@ -60,41 +42,28 @@ namespace NSimulate
 		/// <summary>
 		/// Gets or sets the simulation state associated with this process
 		/// </summary>
-		public ProcessSimulationState SimulationState
-		{
-			get;
-			set;
-		}
+		public ProcessSimulationState SimulationState { get; set; }
 
 		public Priority Priority
-		{
-			get{
-				return priority;
-			}
-			set{
-				priority = value;
-			}
-		}
+        {
+            get => _priority;
+            set => _priority = value;
+        }
 
-		public int InstanceIndex
-		{
-			get{
-				return instanceIndex;
-			}
-		}
+        public int GetInstanceIndex() => _instanceIndex;
 
-		/// <summary>
-		/// Simulate the process.
-		/// </summary>
-		public virtual IEnumerator<InstructionBase> Simulate()
+        /// <summary>
+        /// Simulate the process.
+        /// </summary>
+        public virtual IEnumerator<InstructionBase> Simulate()
 		{
-			return new List<InstructionBase>().GetEnumerator();
+            yield break;
 		}
 
 		/// <summary>
 		/// Initialize this instance.
 		/// </summary>
-		protected override void Initialize ()
+		protected override void Initialize()
 		{
 			base.Initialize ();
 		}
