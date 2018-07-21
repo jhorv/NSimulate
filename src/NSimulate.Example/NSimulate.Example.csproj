@@ -68,6 +68,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
+    <ProjectReference Include="..\FSimulate\FSimulate.fsproj">
+      <Project>{9b39017a-6230-4302-b28c-c4486c3538cc}</Project>
+      <Name>FSimulate</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NSimulate\NSimulate.csproj">
       <Project>{5f40bda4-d8fc-4d9d-8bc8-cf7a26bb2c74}</Project>
       <Name>NSimulate</Name>
