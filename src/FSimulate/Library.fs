@@ -6,8 +6,6 @@ open System.Linq
 open System.Reflection
 open System.Runtime.InteropServices
 open FSharp.Linq
-open FSimulate
-open System.Threading.Tasks
 
 type Priority =
     | VeryHigh = 100
