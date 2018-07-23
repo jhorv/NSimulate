@@ -25,7 +25,7 @@ namespace FSimulate.UnitTest
 				var registeredProcesses = context.GetByType<Process>();
 				Assert.IsTrue(registeredProcesses.Contains(process));
 
-				var enumerator = process.Simulate();
+				var enumerator = process.Simulate().GetEnumerator();
 
 				bool couldMove = enumerator.MoveNext();
 				Assert.IsTrue(couldMove);

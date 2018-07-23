@@ -15,7 +15,7 @@ namespace FSimulate.UnitTest
 			private set;
 		}
 
-        public override IEnumerator<InstructionBase> Simulate()
+        public override IEnumerable<InstructionBase> Simulate()
         {
             foreach (var instruction in Instructions)
             {

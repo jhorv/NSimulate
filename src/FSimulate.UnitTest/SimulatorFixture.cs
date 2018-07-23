@@ -83,41 +83,40 @@ namespace FSimulate.UnitTest
 		[Test()]
 		public void Simulate_ResourceContention_SimulationEndsAtExpectedPeriod ()
 		{
-            throw new NotImplementedException();
-			//using (var context = new SimulationContext()){
+            using (var context = new SimulationContext())
+            {
+                new TestResource(context, 1);
 
-			//	new TestResource(context, 1);
+                var firstAllocation = new AllocateInstruction<TestResource>(1);
+                var secondAllocation = new AllocateInstruction<TestResource>(1);
+                var firstRelease = new ReleaseInstruction<TestResource>(firstAllocation);
+                var secondRelease = new ReleaseInstruction<TestResource>(secondAllocation);
 
-			//	var firstAllocation = new AllocateInstruction<TestResource>(1);
-			//	var secondAllocation = new AllocateInstruction<TestResource>(1);
-			//	var firstRelease = new ReleaseInstruction<TestResource>(firstAllocation);
-			//	var secondRelease = new ReleaseInstruction<TestResource>(secondAllocation);
+                var processor1Instructions = new List<InstructionBase>(){
+                    firstAllocation,
+                    new WaitInstruction(5),
+                    firstRelease,
+                    new WaitInstruction(10)
+                };
 
-			//	var processor1Instructions = new List<InstructionBase>(){
-			//		firstAllocation,
-			//		new WaitInstruction(5),
-			//		firstRelease,
-			//		new WaitInstruction(10)
-			//	};
+                var processor2Instructions = new List<InstructionBase>(){
+                    secondAllocation,
+                    new WaitInstruction(2),
+                    secondRelease,
+                    new WaitInstruction(9),
+                };
 
-			//	var processor2Instructions = new List<InstructionBase>(){
-			//		secondAllocation,
-			//		new WaitInstruction(2),
-			//		secondRelease,
-			//		new WaitInstruction(9),
-			//	};
+                var processor1 = new InstructionListTestProcess(context, processor1Instructions);
+                var processor2 = new InstructionListTestProcess(context, processor2Instructions);
 
-			//	var processor1 = new InstructionListTestProcess(context, processor1Instructions);
-			//	var processor2 = new InstructionListTestProcess(context, processor2Instructions);
+                var simulator = new Simulator(context);
 
-			//	var simulator = new Simulator(context);
+                simulator.Simulate();
 
-			//	simulator.Simulate();
-
-			//	// simulation time is extended due to resource contention
-			//	Assert.AreEqual(16, context.TimePeriod);
-			//}
-		}
+                // simulation time is extended due to resource contention
+                Assert.AreEqual(16, context.TimePeriod);
+            }
+        }
 	}
 }
 

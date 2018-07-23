@@ -46,6 +46,9 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Example1.fs" />
+    <Compile Include="Example2.fs" />
+    <Compile Include="Example3.fs" />
     <Compile Include="Example4.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
@@ -64,6 +67,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FSimulate.UnitTest\FSimulate.UnitTest.csproj">
+      <Name>FSimulate.UnitTest</Name>
+      <Project>{93f5888b-e55f-43e4-925a-77a107e91f6f}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\FSimulate\FSimulate.fsproj">
       <Name>FSimulate</Name>
       <Project>{9b39017a-6230-4302-b28c-c4486c3538cc}</Project>

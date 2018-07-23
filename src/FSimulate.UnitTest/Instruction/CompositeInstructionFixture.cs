@@ -36,65 +36,63 @@ namespace FSimulate.UnitTest
         [Test()]
         public void CanComplete_ContainedInstructionsCalled_CanCompleteOnlyWhenAllContainedInstructionsCan()
         {
-            throw new NotImplementedException();
-            //using (var context = new SimulationContext())
-            //{
-            //    // create a composite instruction with test instructions
-            //    var testInstructions = new List<TestInstruction>();
-            //    for (var i = 1; i <= 10; i++)
-            //    {
-            //        testInstructions.Add(new TestInstruction() { CanCompleteResult = true, CanCompleteNextTimePeriodResult = i });
-            //    }
-            //    var compositeInstruction = new CompositeInstruction(testInstructions.Cast<InstructionBase>().ToList());
+            using (var context = new SimulationContext())
+            {
+                // create a composite instruction with test instructions
+                var testInstructions = new List<TestInstruction>();
+                for (var i = 1; i <= 10; i++)
+                {
+                    testInstructions.Add(new TestInstruction() { CanCompleteResult = true, CanCompleteNextTimePeriodResult = i });
+                }
+                var compositeInstruction = new CompositeInstruction(testInstructions.Cast<InstructionBase>().ToList());
 
-            //    // when all contained instructions can complete, the composite instruction cancomplete call returns true
-            //    var canComplete = compositeInstruction.CanComplete(context, out var nextTimePeriodCheck);
-            //    Assert.IsTrue(canComplete);
-            //    Assert.IsNull(nextTimePeriodCheck);
+                // when all contained instructions can complete, the composite instruction cancomplete call returns true
+                var canComplete = compositeInstruction.CanComplete(context, out var nextTimePeriodCheck);
+                Assert.IsTrue(canComplete);
+                Assert.IsNull(nextTimePeriodCheck);
 
-            //    foreach (TestInstruction testInstruction in testInstructions)
-            //    {
-            //        Assert.IsTrue(testInstruction.HasCanCompleteBeenCalled);
-            //    }
+                foreach (TestInstruction testInstruction in testInstructions)
+                {
+                    Assert.IsTrue(testInstruction.HasCanCompleteBeenCalled);
+                }
 
-            //    // when some of the contained instructions can not complete, the composite instruction can complete call returns false
-            //    for (var i = 0; i <= 3; i++)
-            //    {
-            //        testInstructions[i].CanCompleteResult = false;
-            //    }
-            //    canComplete = compositeInstruction.CanComplete(context, out nextTimePeriodCheck);
-            //    Assert.IsFalse(canComplete);
-            //    // the next time period check is the lowest of any contained instruction next period values
-            //    Assert.AreEqual(1, nextTimePeriodCheck);
+                // when some of the contained instructions can not complete, the composite instruction can complete call returns false
+                for (var i = 0; i <= 3; i++)
+                {
+                    testInstructions[i].CanCompleteResult = false;
+                }
+                canComplete = compositeInstruction.CanComplete(context, out nextTimePeriodCheck);
+                Assert.IsFalse(canComplete);
+                // the next time period check is the lowest of any contained instruction next period values
+                Assert.AreEqual(1, nextTimePeriodCheck);
 
-            //    // the next time period check value is returned as null if any contained instruction returns null
-            //    testInstructions[0].CanCompleteNextTimePeriodResult = null;
-            //    canComplete = compositeInstruction.CanComplete(context, out nextTimePeriodCheck);
-            //    Assert.IsFalse(canComplete);
-            //    Assert.IsNull(nextTimePeriodCheck);
-            //}
+                // the next time period check value is returned as null if any contained instruction returns null
+                testInstructions[0].CanCompleteNextTimePeriodResult = null;
+                canComplete = compositeInstruction.CanComplete(context, out nextTimePeriodCheck);
+                Assert.IsFalse(canComplete);
+                Assert.IsNull(nextTimePeriodCheck);
+            }
         }
 
         [Test()]
         public void Complete_ContainedInstructionsCalled_AllContainedInstructionsCompleted()
         {
-            throw new NotImplementedException();
-            //using (var context = new SimulationContext())
-            //{
-            //    // create a composite instruction with test instructions
-            //    var testInstructions = new List<TestInstruction>();
-            //    for (var i = 1; i <= 10; i++)
-            //    {
-            //        testInstructions.Add(new TestInstruction() { CanCompleteResult = true, CanCompleteNextTimePeriodResult = i });
-            //    }
-            //    var compositeInstruction = new CompositeInstruction(testInstructions.Cast<InstructionBase>().ToList());
+            using (var context = new SimulationContext())
+            {
+                // create a composite instruction with test instructions
+                var testInstructions = new List<TestInstruction>();
+                for (var i = 1; i <= 10; i++)
+                {
+                    testInstructions.Add(new TestInstruction() { CanCompleteResult = true, CanCompleteNextTimePeriodResult = i });
+                }
+                var compositeInstruction = new CompositeInstruction(testInstructions.Cast<InstructionBase>().ToList());
 
-            //    compositeInstruction.Complete(context);
-            //    foreach (TestInstruction testInstruction in testInstructions)
-            //    {
-            //        Assert.IsTrue(testInstruction.HasCompleteBeenCalled);
-            //    }
-            //}
+                compositeInstruction.Complete(context);
+                foreach (TestInstruction testInstruction in testInstructions)
+                {
+                    Assert.IsTrue(testInstruction.HasCompleteBeenCalled);
+                }
+            }
         }
     }
 }

@@ -20,10 +20,10 @@ let main argv =
         Console.WriteLine()
 
         match keyInfo.KeyChar.ToString().ToUpper() with
-        //| "1" -> Example1.Example.Run()
-        //| "2" -> Example2.Example.Run()
-        //| "3" -> Example3.Example.Run()
-        | "4" -> Example4.run()
+        | "1" -> Example1.run ()
+        | "2" -> Example2.run ()
+        | "3" -> Example3.run ()
+        | "4" -> Example4.run ()
         | "Q" ->
             skipLastCharacterExit <- true
             exitOnNextLoop <- true

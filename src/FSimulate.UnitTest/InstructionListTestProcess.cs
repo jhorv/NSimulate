@@ -22,7 +22,7 @@ namespace FSimulate.UnitTest
 			_instructions = instructions.ToList();
 		}
 
-		public override System.Collections.Generic.IEnumerator<InstructionBase> Simulate ()
+		public override IEnumerable<InstructionBase> Simulate ()
 		{
 			foreach(InstructionBase instruction in _instructions){
 				yield return instruction;

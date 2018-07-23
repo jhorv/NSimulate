@@ -14,23 +14,24 @@ type Priority =
     | Low = 400
     | VeryLow = 500
 
+
 [<AbstractClass>]
 [<AllowNullLiteral>]
-type InstructionBase() =
+type InstructionBase (priority : Priority) =
     let mutable _completedAtTimePeriod = Unchecked.defaultof<Nullable<int64>>
+
+    new () = InstructionBase(Priority.Medium)
 
     member val RaisedInTimePeriod = 0L with get, set
     member val IsInterrupted = false with get, set
-    //member val CompletedAtTimePeriod = Nullable<int64>() with get, set
-    //member this.IsCompleted with get() : bool = this.CompletedAtTimePeriod.HasValue
     member this.CompletedAtTimePeriod with get() = _completedAtTimePeriod
     member this.IsCompleted with get() = _completedAtTimePeriod.HasValue
     
     abstract member Priority : Priority with get, set
-    default val Priority = Priority.Medium with get, set
+    default val Priority = priority with get, set
 
-    abstract member CanComplete : context:ISimulationContext * [<Out>] skipFurtherChecksUntilTimePeriod:Nullable<int64> byref -> bool
-    default this.CanComplete (context:ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod:Nullable<int64> byref) =
+    abstract member CanComplete : context:ISimulationContext * [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref -> bool
+    default this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
         skipFurtherChecksUntilTimePeriod <- Unchecked.defaultof<Nullable<int64>>
         false
 
@@ -40,8 +41,8 @@ type InstructionBase() =
         //this.CompletedAtTimePeriod <- context.TimePeriod |> Nullable<int64>
         _completedAtTimePeriod <- context.TimePeriod |> Nullable<int64>
  
-    abstract member Interrupt : context:ISimulationContext -> unit
-    default this.Interrupt (context:ISimulationContext) =
+    abstract member Interrupt : context : ISimulationContext -> unit
+    default this.Interrupt (context : ISimulationContext) =
         this.IsInterrupted <- true
 
 and [<AllowNullLiteral>] ProcessSimulationState () =
@@ -54,16 +55,17 @@ and [<AllowNullLiteral>] ProcessSimulationState () =
 and IProcess =
     abstract member Priority : Priority with get
     abstract member SimulationState : ProcessSimulationState with get
-    abstract member Simulate : unit -> IEnumerator<InstructionBase>
+    abstract member Simulate : unit -> IEnumerable<InstructionBase>
     abstract member GetInstanceIndex : unit -> int
 
 and [<AllowNullLiteral>] ISimulationContext =
     abstract member ActiveProcesses : ISet<IProcess> with get
+    abstract member IsSimulationStopping : bool with get, set
     abstract member IsSimulationTerminating : bool with get, set
     abstract member TimePeriod : int64 with get
     abstract member ProcessesRemainingThisTimePeriod : Queue<IProcess> with get
 
-    abstract member GetByKey<'T> : key : obj -> 'T
+    abstract member GetByKey<'T when 'T :> SimulationElement> : key : obj -> 'T
     abstract member GetByType<'T> : unit -> IEnumerable<'T>
     abstract member MoveToTimePeriod : timePeriod : int64 -> unit
     abstract member Register : typeToRegister : Type * objectToRegister : obj -> unit
@@ -87,9 +89,9 @@ and [<AbstractClass>] SimulationElement (context : ISimulationContext, key : obj
 
 [<AbstractClass>]
 type Activity() =
-    abstract member Simulate : unit -> IEnumerator<InstructionBase>
+    abstract member Simulate : unit -> IEnumerable<InstructionBase>
     default this.Simulate () =
-        Seq.empty<InstructionBase>.GetEnumerator()
+        Seq.empty<InstructionBase>
 
 
 
@@ -111,10 +113,9 @@ type Process (context : ISimulationContext, key : obj) =
     member this.GetInstanceIndex() = instanceIndex
     override this.Initialize() = base.Initialize()
 
-    // TODO try changing this signature to return IEnumerable<InstructionBase>
-    abstract member Simulate : unit -> IEnumerator<InstructionBase>
+    abstract member Simulate : unit -> IEnumerable<InstructionBase>
     default this.Simulate () =
-        Seq.empty<InstructionBase>.GetEnumerator()
+        Seq.empty<InstructionBase>
 
     interface IProcess with
         member this.Priority with get() = this.Priority
@@ -126,10 +127,11 @@ type Process (context : ISimulationContext, key : obj) =
 
 type WaitInstruction (periods : int64) =
     inherit InstructionBase()
+    new (periods : int) = WaitInstruction (int64 periods)
     member this.NumberOfPeriodsToWait with get() = periods
     override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
         let timePeriodToComplete = this.RaisedInTimePeriod + periods
-        skipFurtherChecksUntilTimePeriod <- Nullable<int64>(timePeriodToComplete)
+        skipFurtherChecksUntilTimePeriod <- Nullable timePeriodToComplete
         let canComplete = context.TimePeriod >= timePeriodToComplete
         canComplete
 
@@ -138,20 +140,15 @@ type ActivityHostProcess (context : ISimulationContext, activity : Activity, wai
     inherit Process(context)
     member this.Activity with get() = activity
     member this.WaitTime with get() = waitTime
-    override this.Simulate () =
-        (seq {
-            yield WaitInstruction(waitTime) :> InstructionBase
-            let timePeriodOfActivityStart = context.TimePeriod
-            let enumerator = activity.Simulate()
-            while enumerator.MoveNext() do
-                yield enumerator.Current
-        }).GetEnumerator()
+    override this.Simulate () = seq {
+        yield upcast WaitInstruction(waitTime)
+        //let timePeriodOfActivityStart = context.TimePeriod
+        yield! activity.Simulate()
+    }
 
  
  type Resource (context : ISimulationContext, key : obj, capacity : int) =
     inherit SimulationElement(context, key)
-    let mutable _allocated = 0
-    let mutable _capacity = capacity
 
     new (context : ISimulationContext, key : obj) =
         Resource(context, key, 0)
@@ -162,17 +159,12 @@ type ActivityHostProcess (context : ISimulationContext, activity : Activity, wai
     new (context : ISimulationContext) =
         Resource(context, 0)
 
-    member this.Allocated
-        with get() = _allocated
-        and set(value) = _allocated <- value
-
-    member this.Capacity
-        with get() = _capacity
-        and set(value) = _capacity <- value
+    member val Allocated = 0 with get, set
+    member val Capacity = capacity with get, set
 
 
  
- type ActivateInstruction(proc:Process) =
+ type ActivateInstruction (p : Process) =
     inherit InstructionBase()
 
     override this.CanComplete(context:ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
@@ -182,33 +174,31 @@ type ActivityHostProcess (context : ISimulationContext, activity : Activity, wai
     override this.Complete(context:ISimulationContext) =
         base.Complete(context)
 
-        if proc.SimulationState.IsActive = false then
-            proc.SimulationState.IsActive <- true
+        if p.SimulationState.IsActive = false then
+            p.SimulationState.IsActive <- true
 
-        // TODO: refactor to just Add() and use the return value for the subsequent logic
-        if context.ActiveProcesses.Contains(proc) = false then
-            context.ActiveProcesses.Add(proc) |> ignore
+        if context.ActiveProcesses.Add p then
             // ensure the process just activated will be processed by the simulator again in the current time period
-            if context.ProcessesRemainingThisTimePeriod.Contains(proc) = false then
-                context.ProcessesRemainingThisTimePeriod.Enqueue(proc)
+            if context.ProcessesRemainingThisTimePeriod.Contains p = false then
+                context.ProcessesRemainingThisTimePeriod.Enqueue p
 
 
-// TODO - factor out need for "as this"
+/// Instruction used to allocate resources
+[<AllowNullLiteral>]
 type AllocateInstruction<'R when 'R :> Resource>
     (number : int
     , resourceMatchFunction : Func<'R, bool>
     , resourcePriorityFunction : Func<'R, int>)
-    as this =
+    =
     
-    inherit InstructionBase()
+    inherit InstructionBase(Priority.Low)
 
-    //let _resourceMatchFunction = defaultArg resourceMatchFunction (Func<'R, bool>(fun o -> true))
     let _resourceMatchFunction =
         if resourceMatchFunction <> null then
             resourceMatchFunction
         else
             (Func<'R, bool>(fun o -> true))
-    //let _resourcePriorityFunction = defaultArg resourcePriorityFunction Unchecked.defaultof<Func<'R, int>>
+
     let _resourcePriorityFunction = if resourcePriorityFunction <> null then resourcePriorityFunction else Unchecked.defaultof<Func<'R, int>>
     let mutable _allocations = Unchecked.defaultof<List<KeyValuePair<'R, int>>>
     let mutable _numberRequested = number
@@ -224,8 +214,6 @@ type AllocateInstruction<'R when 'R :> Resource>
                 .Where(_resourceMatchFunction)
                 .OrderBy(_resourcePriorityFunction)
                 :> IEnumerable<'R>
-
-    do this.Priority <- Priority.Low
 
     new (number : int, resourceMatchFunction : Func<'R, bool>) =
         AllocateInstruction(number, resourceMatchFunction, null)
@@ -261,7 +249,7 @@ type AllocateInstruction<'R when 'R :> Resource>
 
         let resources = getSortedResources context
 
-        _allocations <- List<KeyValuePair<'R, int>>()
+        _allocations <- List<KeyValuePair<'R, int>> ()
 
         // TODO: refactor C# translation (currently inefficient because of no F# break statement)
         let mutable allocated = 0
@@ -290,86 +278,115 @@ type AllocateInstruction<'R when 'R :> Resource>
 
 
 
-// TODO
-type CompositeInstruction() =
+/// A Composite instruction which groups a set of other instructions.
+type CompositeInstruction (instructions : IEnumerable<InstructionBase>) =
     inherit InstructionBase()
-    override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
-        raise <| NotImplementedException()
-    override this.Complete (context : ISimulationContext) =
-        raise <| NotImplementedException()
+    let instructions = instructions.ToList()
 
+    new ([<ParamArray>] instructions : InstructionBase[]) =
+        CompositeInstruction(instructions)
 
-
-// TODO
-type DeactivateInstruction() =
-    inherit InstructionBase()
-    override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
-        raise <| NotImplementedException()
-    override this.Complete (context : ISimulationContext) =
-        raise <| NotImplementedException()
-
-
-
-// TODO
-type InterruptInstruction() =
-    inherit InstructionBase()
-    override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
-        raise <| NotImplementedException()
-    override this.Complete (context : ISimulationContext) =
-        raise <| NotImplementedException()
-
-
-// TODO
-type PassInstruction() =
-    inherit InstructionBase()
-    override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
-        raise <| NotImplementedException()
-    override this.Complete (context : ISimulationContext) =
-        raise <| NotImplementedException()
-
-
-//// TODO - factor out need for "as this"
-//type WaitNotificationInstruction<'T> ([<Optional; DefaultParameterValue(null)>] ?matchingCondition: Func<'T, bool>) as this =
-//    inherit InstructionBase()
-
-//    let _matchingCondition = defaultArg matchingCondition Unchecked.defaultof<Func<'T, bool>>
-//    let _notifications = List<'T>()
-//    do this.Priority <- Priority.Low
-
-//    member this.MatchingCondition with get() = _matchingCondition
-//    member this.Notifications with get() = _notifications
-
-//    // TODO move logic to this type that adds items to Notifications
-//    override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
-//        skipFurtherChecksUntilTimePeriod <- Unchecked.defaultof<Nullable<int64>>
-//        let mutable canComplete = false
-//        if _notifications.Count > 0 then
-//            canComplete <- true
-//        canComplete
-
-// TODO - factor out need for "as this"
-type WaitNotificationInstruction<'T> (matchingCondition : Func<'T, bool>) as this =
-    inherit InstructionBase()
-    //let mutable _matchingCondition = Unchecked.defaultof<Func<'T, bool>>
-
-    let _notifications = List<'T>()
-    do this.Priority <- Priority.Low
-
-    new () = WaitNotificationInstruction(null)
-
-    member this.MatchingCondition with get() = matchingCondition
-    member this.Notifications with get() = _notifications
-
-    // TODO move logic to this type that adds items to Notifications
     override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
         skipFurtherChecksUntilTimePeriod <- Unchecked.defaultof<Nullable<int64>>
-        let mutable canComplete = false
-        if _notifications.Count > 0 then
-            canComplete <- true
+
+        let mutable canComplete = true
+        let mutable nullCheckTimePeriodEncountered = false
+
+        // iterate through all contained instructions, check whether they can all complete
+        // the value returned in skipFurtherChecksUntilTimePeriod is the lowest value of any instrution, and null if any return null for this value
+        for instruction in instructions do
+            let mutable nextCheckTimePeriod = Unchecked.defaultof<Nullable<int64>>
+            let thisInstructionCanComplete = instruction.CanComplete(context, &nextCheckTimePeriod)
+            if not thisInstructionCanComplete then
+                canComplete <- false
+                if not nextCheckTimePeriod.HasValue then
+                    nullCheckTimePeriodEncountered <- true
+                    nextCheckTimePeriod <- Unchecked.defaultof<Nullable<int64>>
+                elif not nullCheckTimePeriodEncountered &&
+                     (skipFurtherChecksUntilTimePeriod.HasValue = false || skipFurtherChecksUntilTimePeriod.Value > nextCheckTimePeriod.Value) then
+                    skipFurtherChecksUntilTimePeriod <- nextCheckTimePeriod
+
+        if canComplete then
+            skipFurtherChecksUntilTimePeriod <- Unchecked.defaultof<Nullable<int64>>
+
+        canComplete
+
+    override this.Complete (context : ISimulationContext) =
+        for instruction in instructions do
+            instruction.Complete context
+
+        base.Complete context
+
+
+/// An instruction used to deactivate a process
+type DeactivateInstruction (p : IProcess) =
+    inherit InstructionBase()
+    
+    override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
+        skipFurtherChecksUntilTimePeriod <- Unchecked.defaultof<Nullable<int64>>
+        true
+    
+    override this.Complete (context : ISimulationContext) =
+        base.Complete context
+
+        // de-activate the process
+        if p.SimulationState.IsActive then
+            p.SimulationState.IsActive <- false
+
+        context.ActiveProcesses.Remove(p) |> ignore
+
+
+/// An instruction used to interrupt another process.
+type InterruptInstruction (p : IProcess) =
+    inherit InstructionBase()
+    
+    override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
+        skipFurtherChecksUntilTimePeriod <- Unchecked.defaultof<Nullable<int64>>
+        true
+       
+    override this.Complete (context : ISimulationContext) =
+        base.Complete context
+
+        // interrupt the process
+        p.SimulationState.IsInterrupted <- true
+        if p.SimulationState.InstructionEnumerator <> null && p.SimulationState.InstructionEnumerator.Current <> null then
+            p.SimulationState.InstructionEnumerator.Current.Interrupt context
+
+        if p.SimulationState.IsActive then
+            if context.ProcessesRemainingThisTimePeriod.Contains p = false then
+                context.ProcessesRemainingThisTimePeriod.Enqueue p
+
+
+/// An instruction used to pass control from a process back to the simulator without performing any other action.
+type PassInstruction() =
+    inherit InstructionBase()
+    let mutable hasPassed = false
+    override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
+        skipFurtherChecksUntilTimePeriod <- Unchecked.defaultof<Nullable<int64>>
+        let canComplete = hasPassed
+        if not hasPassed then hasPassed <- true
         canComplete
 
 
 
+/// An instruction that causes a process to wait until an event is fired
+type WaitNotificationInstruction<'T> (matchingCondition : Func<'T, bool>) =
+    inherit InstructionBase(Priority.Low)
+
+    let notifications = List<'T>()
+
+    new () = WaitNotificationInstruction(null)
+
+    member this.MatchingCondition with get() = matchingCondition
+    member this.Notifications with get() = notifications
+
+    // TODO move logic to this type that adds items to Notifications
+    override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
+        skipFurtherChecksUntilTimePeriod <- Unchecked.defaultof<Nullable<int64>>
+        notifications.Count > 0
+
+
+/// An instruction used to raise an event
 type RaiseNotificationInstruction<'T> (notificationToRaise : 'T) =
     inherit InstructionBase()
     member this.Notification with get() = notificationToRaise
@@ -390,28 +407,32 @@ type RaiseNotificationInstruction<'T> (notificationToRaise : 'T) =
                     if waitEventInstruction.MatchingCondition = null || waitEventInstruction.MatchingCondition.Invoke(notificationToRaise) then
                         waitEventInstruction.Notifications.Add(notificationToRaise)
 
-        // This is done by base.Complete
-        //this.CompletedAtTimePeriod <- Nullable<int64>(context.TimePeriod)
 
-
-
-// TODO
-type ReleaseInstruction() =
+/// An instruction used to release allocated resources
+type ReleaseInstruction<'T when 'T :> Resource> (allocateInstruction : AllocateInstruction<'T>) =
     inherit InstructionBase()
+    
     override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
-        raise <| NotImplementedException()
+        skipFurtherChecksUntilTimePeriod <- Unchecked.defaultof<Nullable<int64>>
+        true
+
     override this.Complete (context : ISimulationContext) =
-        raise <| NotImplementedException()
+        base.Complete context
+
+        if allocateInstruction <> null && allocateInstruction.IsAllocated && not allocateInstruction.IsReleased then
+            allocateInstruction.Release ()
 
 
-// TODO
+
 type ScheduleActivityInstruction (activity : Activity, waitTime : int64) =
     inherit InstructionBase()
     member this.Activity with get() = activity
     member this.WaitTime with get() = waitTime
+    
     override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
         skipFurtherChecksUntilTimePeriod <- Unchecked.defaultof<Nullable<int64>>
         true
+    
     override this.Complete (context : ISimulationContext) =
         base.Complete context
         
@@ -424,16 +445,22 @@ type ScheduleActivityInstruction (activity : Activity, waitTime : int64) =
             context.ProcessesRemainingThisTimePeriod.Enqueue(p)
 
 
-// TODO
+/// An instruction used to stop the simulation.
+/// <remarks>This instruction, when completed, marks the simulation as stopping.  Individual processes are responsible for responding to this flag.</remarks>
 type StopSimulationInstruction() =
     inherit InstructionBase()
+
     override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
-        raise <| NotImplementedException()
+        skipFurtherChecksUntilTimePeriod <- Unchecked.defaultof<Nullable<int64>>
+        true
+
     override this.Complete (context : ISimulationContext) =
-        raise <| NotImplementedException()
-    
+        base.Complete context
+        context.IsSimulationStopping <- true
 
 
+/// An instruction used to termine the simulation.
+/// <remarks>This instruction, when completed, marks the simulation as terminating.  The simulator terminates the simulation without relying on individual processes to stop.</remarks>
 type TerminateSimulationInstruction() =
     inherit InstructionBase()
     override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
@@ -444,30 +471,30 @@ type TerminateSimulationInstruction() =
         context.IsSimulationTerminating <- true
 
 
-type WaitConditionInstruction(condition : Func<bool>) =
+/// Instruction used to wait until a condition is met
+type WaitConditionInstruction (condition : Func<bool>) =
     inherit InstructionBase()
     member this.Condition with get() = condition
     override this.CanComplete (context : ISimulationContext, [<Out>] skipFurtherChecksUntilTimePeriod : Nullable<int64> byref) =
         skipFurtherChecksUntilTimePeriod <- Unchecked.defaultof<Nullable<int64>>
-        condition.Invoke()
+        condition.Invoke ()
 
 
 
 /// A process that acts as a trigger for ending the simulation
 type SimulationEndTrigger (context:ISimulationContext, condition:Func<bool>) =
     inherit Process(context)
-    let mutable _condition = condition
 
-    member this.Condition with get() = _condition
+    member this.Condition with get() = condition
 
-    // TODO can this be done more cleanly?
     override this.Simulate () =
-        (seq {
-            yield WaitConditionInstruction(_condition) :> InstructionBase
+        seq {
+            yield WaitConditionInstruction(condition) :> InstructionBase
             yield TerminateSimulationInstruction() :> InstructionBase
-        }).GetEnumerator()
+        }
         
 
+/// A Simulator used to orchestrate the simulation of processes in the overall simulation context
 type Simulator (context : ISimulationContext) =
 
     let simulateProcessAtTimePeriod (p : IProcess, nextTimePeriod : Nullable<int64> byref) =
@@ -493,7 +520,7 @@ type Simulator (context : ISimulationContext) =
                 else
                     shouldMoveNext <- false
 
-                if didComplete = false then
+                if not didComplete then
                     if nextTimePeriodCheck.HasValue && (nextTimePeriod.HasValue = false || nextTimePeriodCheck.Value < nextTimePeriod.Value) then
                         nextTimePeriod <- nextTimePeriodCheck
 
@@ -521,8 +548,8 @@ type Simulator (context : ISimulationContext) =
                 let p = context.ProcessesRemainingThisTimePeriod.Dequeue()
 
                 if p.SimulationState.IsActive then
-                    if p.SimulationState.InstructionEnumerator = null then
-                        p.SimulationState.InstructionEnumerator <- p.Simulate ()
+                    if isNull p.SimulationState.InstructionEnumerator then
+                        p.SimulationState.InstructionEnumerator <- p.Simulate().GetEnumerator()
                     
                     simulateProcessAtTimePeriod (p, &nextTimePeriod)
 
@@ -535,7 +562,7 @@ type Simulator (context : ISimulationContext) =
                 complete <- true
 
 
-
+/// Context containing state information for a simulation
 type SimulationContext () =
     let _registeredElements = new Dictionary<Type, Dictionary<obj, SimulationElement>>()
     let mutable _timePeriod = 0L
@@ -586,18 +613,18 @@ type SimulationContext () =
     member this.MoveToTimePeriod (timePeriod : int64) =
         _timePeriod <- timePeriod
 
-        if _activeProcesses = null then
+        if isNull _activeProcesses then
             _activeProcesses <- HashSet<IProcess>()
             let processes = this.GetByType<Process>()
             for p in processes do
-                if p.SimulationState = null then
+                if isNull p.SimulationState then
                     p.SimulationState <- ProcessSimulationState()
                 if p.SimulationState.IsActive then
                     _activeProcesses.Add(p) |> ignore
 
         let tryGetProcessStatePriority (p : IProcess) =
             if p.SimulationState <> null && p.SimulationState.InstructionEnumerator <> null && p.SimulationState.InstructionEnumerator.Current <> null then
-                p.Priority
+                p.SimulationState.InstructionEnumerator.Current.Priority
             else
                 Priority.Medium
 
@@ -641,12 +668,15 @@ type SimulationContext () =
 
     interface ISimulationContext with
         member this.ActiveProcesses with get() = this.ActiveProcesses
+        member this.IsSimulationStopping
+            with get() = this.IsSimulationStopping
+            and set(value) = this.IsSimulationStopping <- value
         member this.IsSimulationTerminating
             with get() = this.IsSimulationTerminating
             and set(value) = this.IsSimulationTerminating <- value
         member this.TimePeriod with get() = this.TimePeriod
         member this.ProcessesRemainingThisTimePeriod with get() = this.ProcessesRemainingThisTimePeriod
-        member this.GetByKey<'T> (key : obj) = this.GetByKey<'T>(key)
+        member this.GetByKey<'T when 'T :> SimulationElement> (key : obj) = this.GetByKey<'T>(key)
         member this.GetByType<'T> () = this.GetByType<'T>()
         member this.MoveToTimePeriod (timePeriod : int64) = this.MoveToTimePeriod(timePeriod)
         member this.Register (typeToRegister : Type, objectToRegister : obj) = this.Register(typeToRegister, objectToRegister)

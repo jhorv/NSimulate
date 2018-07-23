@@ -11,35 +11,35 @@ namespace FSimulate.UnitTest
 		[Test()]
 		public void Complete_ResourcesAllocated_ResourcesDeallocated()
 		{
-            throw new NotImplementedException();
-            //using (var context = new SimulationContext()){
+            using (var context = new SimulationContext())
+            {
 
-            //	int resouceCapacity = 5;
-            //	var testResourceSet1 = new TestResource(context, resouceCapacity) { Code = "First", Priority = 10 };
-            //	context.Register<TestResource>(testResourceSet1);
+                int resouceCapacity = 5;
+                var testResourceSet1 = new TestResource(context, resouceCapacity) { Code = "First", Priority = 10 };
+                context.Register<TestResource>(testResourceSet1);
 
-            //	var allocateInstruction = new AllocateInstruction<TestResource>(context, resouceCapacity);
-            //	allocateInstruction.Complete(context);
+                var allocateInstruction = new AllocateInstruction<TestResource>(resouceCapacity);
+                allocateInstruction.Complete(context);
 
-            //	Assert.AreEqual(resouceCapacity, testResourceSet1.Allocated);
-            //	Assert.AreEqual(testResourceSet1.Allocated, allocateInstruction
-            //	   .Allocations
-            //	   .First(al=>al.Key == testResourceSet1)
-            //	   .Value);
+                Assert.AreEqual(resouceCapacity, testResourceSet1.Allocated);
+                Assert.AreEqual(testResourceSet1.Allocated, allocateInstruction
+                   .Allocations
+                   .First(al => al.Key == testResourceSet1)
+                   .Value);
 
-            //	var releaseInstruction = new ReleaseInstruction<TestResource>(context, allocateInstruction);
+                var releaseInstruction = new ReleaseInstruction<TestResource>(allocateInstruction);
 
-            //	long? nextTimePeriodCheck;
-            //	bool canComplete = releaseInstruction.CanComplete(context, out nextTimePeriodCheck);
+                long? nextTimePeriodCheck;
+                bool canComplete = releaseInstruction.CanComplete(context, out nextTimePeriodCheck);
 
-            //	Assert.IsTrue(canComplete);
-            //	Assert.IsNull(nextTimePeriodCheck);
+                Assert.IsTrue(canComplete);
+                Assert.IsNull(nextTimePeriodCheck);
 
-            //	releaseInstruction.Complete(context);
+                releaseInstruction.Complete(context);
 
-            //	Assert.AreEqual(0, testResourceSet1.Allocated);
-            //	Assert.IsTrue(allocateInstruction.IsReleased);
-            //}
+                Assert.AreEqual(0, testResourceSet1.Allocated);
+                Assert.IsTrue(allocateInstruction.IsReleased);
+            }
         }
 	}
 }

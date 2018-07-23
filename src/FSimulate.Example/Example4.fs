@@ -1,5 +1,6 @@
 ﻿module Example4
 open System
+open System.Collections.Generic
 open FSimulate
 
 type AlarmRingingNotification() = class end
@@ -8,47 +9,42 @@ type AwakeNotification() = class end
 type AlarmActivity () =
     inherit Activity()
     override this.Simulate () =
-        (seq {
+        seq {
             yield RaiseNotificationInstruction<AlarmRingingNotification>(AlarmRingingNotification()) :> InstructionBase
-        }).GetEnumerator()
+        }
 
 type AlarmSettingProcess (context : ISimulationContext) =
     inherit Process(context)
     override this.Simulate () =
-        (seq {
+        seq {
             // set the alarm activity to occur 8 time periods from now
             yield ScheduleActivityInstruction(AlarmActivity(), 8L) :> InstructionBase
 
             // and another alarm activity to occur 9 time periods from now
             yield ScheduleActivityInstruction(AlarmActivity(), 9L) :> InstructionBase
-        }).GetEnumerator()
+        }
 
 type SleepingProcess (context : ISimulationContext) =
     inherit Process(context)
     override this.Simulate() =
-        (seq {
-            //Console.WriteLine("Going to sleep at time period {0}", this.Context.TimePeriod)
-            Console.WriteLine("Going to sleep at time period {0}", context.TimePeriod)
+        seq {
+            printfn "Going to sleep at time period %i" context.TimePeriod
             
             // wait till the alarm rings
             yield WaitNotificationInstruction<AlarmRingingNotification>() :> InstructionBase
 
-            //Console.WriteLine("Alarm ringing at time period {0}", this.Context.TimePeriod)
-            Console.WriteLine("Alarm ringing at time period {0}", context.TimePeriod)
-            //Console.WriteLine("Going back to sleep at time period {0}", this.Context.TimePeriod)
-            Console.WriteLine("Going back to sleep at time period {0}", context.TimePeriod)
+            printfn "Alarm ringing at time period %i" context.TimePeriod
+            printfn "Going back to sleep at time period %i" context.TimePeriod
 
             // go back to sleep and wait till it rings again
             yield new WaitNotificationInstruction<AlarmRingingNotification>() :> InstructionBase
 
-            //Console.WriteLine("Alarm ringing again..waking up at time period {0}", this.Context.TimePeriod)
-            Console.WriteLine("Alarm ringing again..waking up at time period {0}", context.TimePeriod)
+            printfn "Alarm ringing again..waking up at time period %i" context.TimePeriod
 
             // notify now awake
-            let notification = new AwakeNotification();
+            let notification = new AwakeNotification()
             yield RaiseNotificationInstruction(notification) :> InstructionBase
-
-        }).GetEnumerator()
+        }
 
 
 let run () =

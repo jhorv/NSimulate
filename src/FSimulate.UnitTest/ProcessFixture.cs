@@ -29,7 +29,7 @@ namespace FSimulate.UnitTest
             {
                 var process = new Process(context);
 
-                var enumerator = process.Simulate();
+                var enumerator = process.Simulate().GetEnumerator();
 
                 Assert.IsNotNull(enumerator);
                 Assert.IsFalse(enumerator.MoveNext());

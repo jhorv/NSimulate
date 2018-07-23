@@ -16,7 +16,7 @@ namespace FSimulate.UnitTest
 				var process = new InstructionListTestProcess(context, new List<InstructionBase>(){ waitInstruction});
 
 				context.MoveToTimePeriod(0);
-				process.SimulationState.InstructionEnumerator = process.Simulate();
+				process.SimulationState.InstructionEnumerator = process.Simulate().GetEnumerator();
 				process.SimulationState.InstructionEnumerator.MoveNext();
 
 				var testEvent = new TestNotification();
@@ -45,7 +45,7 @@ namespace FSimulate.UnitTest
 				var waitInstruction = new WaitNotificationInstruction<TestNotification>((e)=>e.Data > 0);
 				var process = new InstructionListTestProcess(context, new List<InstructionBase>(){ waitInstruction});
 				context.MoveToTimePeriod(0);
-				process.SimulationState.InstructionEnumerator = process.Simulate();
+				process.SimulationState.InstructionEnumerator = process.Simulate().GetEnumerator();
 				process.SimulationState.InstructionEnumerator.MoveNext();
 
 				var testEvent1 = new TestNotification() { Data = 0 };
